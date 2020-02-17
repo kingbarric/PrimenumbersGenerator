@@ -46,7 +46,9 @@ public class StatsModelServiceImpl implements StatsModelFacade {
     public ResponseEntity saveStats(StatsModelDTO statsdto) {
         message.clear();
         try {
+            
             StatsModel stats = new ModelMapper().map(statsdto, StatsModel.class);
+            stats.setId(0);
             if (stats.getStartPosition() == null) {
 
                 message.put("code", 1);
