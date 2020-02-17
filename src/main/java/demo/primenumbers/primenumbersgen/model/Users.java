@@ -5,6 +5,7 @@
  */
 package demo.primenumbers.primenumbersgen.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -53,10 +54,14 @@ public class Users implements  Serializable{
         this.statsModels = statsModels;
     }
 
+    public Users() {
+    }
+
  
         
         
 
+    @JsonIgnore
     public List<StatsModel> getStatsModels() {
         return statsModels;
     }

@@ -6,6 +6,8 @@
 package demo.primenumbers.primenumbersgen.resources;
 
  
+import demo.primenumbers.primenumbersgen.facade.StatsModelFacade;
+import demo.primenumbers.primenumbersgen.facade.UsersFacade;
 import demo.primenumbers.primenumbersgen.facadeimplementation.StatsModelServiceImpl;
 import demo.primenumbers.primenumbersgen.facadeimplementation.UserServiceImpl;
 import demo.primenumbers.primenumbersgen.model.StatsModelDTO;
@@ -34,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class GeneralEndpoint {
 
     @Autowired
-    private StatsModelServiceImpl modelFacade;
+    private StatsModelFacade modelFacade;
 
     @Autowired
-    private UserServiceImpl usersFacade;
+    private UsersFacade usersFacade;
 
     @ApiOperation(value = "Run algorithm of prime numbers", notes = "This api execute and save stats of prime numbers from a given range of start and end position")
 

@@ -50,6 +50,9 @@ public class StatsModel implements Serializable {
         this.user = user;
     }
 
+    public StatsModel() {
+    }
+
  
        
 

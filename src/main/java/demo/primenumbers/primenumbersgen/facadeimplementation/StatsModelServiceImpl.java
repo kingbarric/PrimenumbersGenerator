@@ -5,9 +5,6 @@
  */
 package demo.primenumbers.primenumbersgen.facadeimplementation;
 
- 
- 
- 
 import demo.primenumbers.primenumbersgen.facade.StatsModelFacade;
 import demo.primenumbers.primenumbersgen.model.StatsModel;
 import demo.primenumbers.primenumbersgen.model.StatsModelDTO;
@@ -34,6 +31,7 @@ public class StatsModelServiceImpl implements StatsModelFacade {
 
     @Autowired
     private StatsModelRepo statsModelRepo;
+    Map message = new HashMap();
 
     @Autowired
     private UsersRepo usersRepo;
@@ -46,25 +44,36 @@ public class StatsModelServiceImpl implements StatsModelFacade {
      */
     @Override
     public ResponseEntity saveStats(StatsModelDTO statsdto) {
-
+        message.clear();
         try {
             StatsModel stats = new ModelMapper().map(statsdto, StatsModel.class);
             if (stats.getStartPosition() == null) {
-                return ResponseEntity.ok("Starts Position cannot be empty");
+
+                message.put("code", 1);
+                message.put("response", "Starts Position cannot be empty");
+                return ResponseEntity.ok(message);
             }
             if (stats.getEndPosition() == null) {
-                return ResponseEntity.ok("End Position cannot be empty");
+                message.put("code", 1);
+                message.put("response", "End Position cannot be empty");
+                return ResponseEntity.ok(message);
             }
 
             if (stats.getAlgorithm().length() == 0) {
-                return ResponseEntity.ok("Algorithm Position cannot be empty");
+
+                message.put("code", 1);
+                message.put("response", "Algorithm Position cannot be empty");
+                return ResponseEntity.ok(message);
             }
 
             Optional< Users> user = usersRepo.findById(statsdto.getUserId());
             if (user.isPresent()) {
                 stats.setUser(user.get());
             } else {
-                return ResponseEntity.ok("No such user with the ID:  " + statsdto.getUserId() + " , Use getUser api to obtain one");
+                message.put("code", 1);
+                message.put("response", "No such user with the ID:  " + statsdto.getUserId() + " , Use getUser api to obtain one");
+                return ResponseEntity.ok(message);
+
             }
 
             if (stats.getAlgorithm().equals(algo[0])) {
@@ -78,9 +87,7 @@ public class StatsModelServiceImpl implements StatsModelFacade {
                 stats.setTimeElapsed(duration);
                 stats.setNumberReturned(size);
 
-            }
-
-            if (stats.getAlgorithm().equals(algo[1])) {
+            } else if (stats.getAlgorithm().equals(algo[1])) {
                 //Java8Stream
                 Instant start = Instant.now();
                 LinkListHelper l = PrimeNumbers.java8Method(statsdto.getStartPosition(), statsdto.getEndPosition());
@@ -90,10 +97,9 @@ public class StatsModelServiceImpl implements StatsModelFacade {
                 String duration = Duration.between(start, end).toString();
                 stats.setTimeElapsed(duration);
                 stats.setNumberReturned(size);
+                System.err.println("Size: " + size + "Duration:  " + duration);
 
-            }
-
-            if (stats.getAlgorithm().equals(algo[2])) {
+            } else if (stats.getAlgorithm().equals(algo[2])) {
                 //SieveEratosthenes
                 Instant start = Instant.now();
                 LinkListHelper l = PrimeNumbers.theSieveEratosthenesMethod(statsdto.getStartPosition(), statsdto.getEndPosition());
@@ -104,13 +110,24 @@ public class StatsModelServiceImpl implements StatsModelFacade {
                 stats.setTimeElapsed(duration);
                 stats.setNumberReturned(size);
 
+            } else {
+               
+
+                    message.put("code", 1);
+                    message.put("response", "Invalid Algorithm, try 'bruteForceMethod', 'Java8Stream', 'SieveEratosthenes'");
+                    return ResponseEntity.ok(message);
+             
             }
-            stats = this.statsModelRepo.save(stats);
-            return ResponseEntity.ok(stats);
+            StatsModel statsModel = this.statsModelRepo.save(stats);
+            message.put("code", 0);
+            message.put("Response", statsModel);
+            return ResponseEntity.ok(message);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.ok(" Error occured while saving Stats");
+            // e.printStackTrace(); 
+            message.put("code", 0);
+            message.put("Response", "Error occured while saving Stats");
+            return ResponseEntity.ok(message);
         }
     }
 
@@ -135,17 +152,27 @@ public class StatsModelServiceImpl implements StatsModelFacade {
      */
     @Override
     public ResponseEntity findAllModelStatistics() {
-        return ResponseEntity.ok(this.statsModelRepo.findAll());
+        message.put("code", 0);
+        message.put("Response", this.statsModelRepo.findAll());
+        return ResponseEntity.ok(message);
+
     }
 
     @Override
     public ResponseEntity findStatsByUserID(int userId) {
+        message.clear();
         Optional<Users> u = this.usersRepo.findById(userId);
         if (u.isPresent()) {
             List<StatsModel> userList = this.statsModelRepo.findByUser(u.get());
-            return ResponseEntity.ok(userList);
+
+            message.put("code", 0);
+            message.put("Response", userList);
+            return ResponseEntity.ok(message);
         } else {
-            return ResponseEntity.ok("No user with the id : " + userId + " exist.");
+
+            message.put("code", 0);
+            message.put("Response", "No user with the id : " + userId + " exist.");
+            return ResponseEntity.ok(message);
         }
 
     }
