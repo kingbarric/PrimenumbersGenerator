@@ -47,4 +47,3 @@ This will return elapsed time, username, algorithm,range.
 
 The API Doc can be located at http://localhost:8080/swagger-ui.html
 
-
